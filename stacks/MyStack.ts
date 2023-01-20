@@ -9,4 +9,23 @@ export function MyStack({ stack }: StackContext) {
     defaultDatabaseName: DATABASE,
     migrations: "services/migrations",
   });
+
+  // Create a HTTP API
+  const api = new Api(stack, "Api", {
+    defaults: {
+      function: {
+        bind: [cluster],
+      },
+    },
+    routes: {
+      "POST /": "functions/lambda.handler",
+    },
+  });
+
+  // Show the resource info in the output
+  stack.addOutputs({
+    ApiEndpoint: api.url,
+    SecretArn: cluster.secretArn,
+    ClusterIdentifier: cluster.clusterIdentifier,
+  });
 }

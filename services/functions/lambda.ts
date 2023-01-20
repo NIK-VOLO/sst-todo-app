@@ -1,9 +1,38 @@
-import { APIGatewayProxyHandlerV2 } from "aws-lambda";
+import { RDSDataService } from "aws-sdk";
+import { Kysely } from "kysely";
+import { DataApiDialect } from "kysely-data-api";
+import { RDS } from "@serverless-stack/node/rds";
 
-export const handler: APIGatewayProxyHandlerV2 = async (event) => {
+interface Database {
+  tblcounter: {
+    counter: string;
+    tally: number;
+  };
+}
+
+const db = new Kysely<Database>({
+  dialect: new DataApiDialect({
+    mode: "postgres",
+    driver: {
+      database: RDS.Cluster.defaultDatabaseName,
+      secretArn: RDS.Cluster.secretArn,
+      resourceArn: RDS.Cluster.clusterArn,
+      client: new RDSDataService(),
+    },
+  }),
+});
+
+export async function handler() {
+  const record = await db
+    .selectFrom("tblcounter")
+    .select("tally")
+    .where("counter", "=", "hits")
+    .executeTakeFirstOrThrow();
+
+  let count = record.tally;
+
   return {
     statusCode: 200,
-    headers: { "Content-Type": "text/plain" },
-    body: `Hello, World! Your request was received at ${event.requestContext.time}.`,
+    body: count,
   };
-};
+}
