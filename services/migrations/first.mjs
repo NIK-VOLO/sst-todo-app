@@ -4,6 +4,8 @@ import { Kysely } from "kysely";
  * @param db {Kysely<any>}
  */
 export async function up(db) {
+
+  // Template table schema
   await db.schema
     .createTable("tblcounter")
     .addColumn("counter", "text", (col) => col.primaryKey())
@@ -16,6 +18,14 @@ export async function up(db) {
       counter: "hits",
       tally: 0,
     })
+    .execute();
+
+  
+    // My table schema for storing Todo tasks
+    await db.schema
+    .createTable("tbltasks")
+    .addColumn("id", "integer", (col) => col.primaryKey())
+    .addColumn("task", "text")
     .execute();
 }
 
