@@ -1,7 +1,7 @@
 import { Api, RDS, StackContext } from "@serverless-stack/resources";
 
 export function MyStack({ stack }: StackContext) {
-  const DATABASE = "CounterDB";
+  const DATABASE = "TodoDB";
 
   // Create the Aurora DB cluster
   const cluster = new RDS(stack, "Cluster", {
