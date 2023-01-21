@@ -31,6 +31,13 @@ export async function handler() {
 
   let count = record.tally;
 
+  await db
+  .updateTable("tblcounter")
+  .set({
+    tally: ++count,
+  })
+  .execute();
+
   return {
     statusCode: 200,
     body: count,
