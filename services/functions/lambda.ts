@@ -8,6 +8,10 @@ interface Database {
     counter: string;
     tally: number;
   };
+  tbltasks:{
+    // id:number;
+    task: string;
+  }
 }
 
 const db = new Kysely<Database>({
@@ -21,6 +25,17 @@ const db = new Kysely<Database>({
     },
   }),
 });
+
+export async function addTask(){
+  await db.insertInto("tbltasks").values({
+    task: "test"
+  }).execute()
+
+  return {
+    statusCode: 200,
+    body: "Task added.",
+  };
+}
 
 export async function handler() {
   const record = await db

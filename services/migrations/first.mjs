@@ -24,7 +24,7 @@ export async function up(db) {
     // My table schema for storing Todo tasks
     await db.schema
     .createTable("tbltasks")
-    .addColumn("id", "integer", (col) => col.primaryKey())
+    .addColumn("id", "serial", (col) => col.primaryKey())
     .addColumn("task", "text")
     .execute();
 }
