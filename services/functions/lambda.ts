@@ -1,5 +1,5 @@
 import { RDSDataService } from "aws-sdk";
-import { Kysely } from "kysely";
+import { Kysely, Generated } from "kysely";
 import { DataApiDialect } from "kysely-data-api";
 import { RDS } from "@serverless-stack/node/rds";
 
@@ -8,10 +8,10 @@ interface Database {
     counter: string;
     tally: number;
   };
-  tbltasks:{
-    // id:number;
+  tbltasks: {
+    id: Generated<number>;
     task: string;
-  }
+  };
 }
 
 const db = new Kysely<Database>({
@@ -26,10 +26,14 @@ const db = new Kysely<Database>({
   }),
 });
 
-export async function addTask(){
-  await db.insertInto("tbltasks").values({
-    task: "test"
-  }).execute()
+export async function addTask() {
+  await db
+    .insertInto("tbltasks")
+    .values({
+      task: "test",
+    })
+    .returning("id")
+    .executeTakeFirst();
 
   return {
     statusCode: 200,
@@ -47,11 +51,11 @@ export async function handler() {
   let count = record.tally;
 
   await db
-  .updateTable("tblcounter")
-  .set({
-    tally: ++count,
-  })
-  .execute();
+    .updateTable("tblcounter")
+    .set({
+      tally: ++count,
+    })
+    .execute();
 
   return {
     statusCode: 200,
