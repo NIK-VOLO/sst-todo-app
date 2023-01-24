@@ -26,7 +26,9 @@ const db = new Kysely<Database>({
   }),
 });
 
-export async function addTask() {
+export async function addTask(event: any) {
+  //TODO: Revisit event type
+  const data = JSON.parse(event.body);
   await db
     .insertInto("tbltasks")
     .values({
