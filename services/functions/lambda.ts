@@ -1,7 +1,8 @@
 import { RDSDataService } from "aws-sdk";
-import { Kysely, Generated } from "kysely";
+import { Kysely, Generated, sql } from "kysely";
 import { DataApiDialect } from "kysely-data-api";
 import { RDS } from "@serverless-stack/node/rds";
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 
 interface Database {
   tblcounter: {
@@ -26,20 +27,57 @@ const db = new Kysely<Database>({
   }),
 });
 
-export async function addTask(event: any) {
-  //TODO: Revisit event type
+export async function addTask(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  if (event.body == null || event.body == undefined) {
+    return { statusCode: 500, body: "Bad Request" };
+  }
+
   const data = JSON.parse(event.body);
-  await db
+
+  const id = await db
     .insertInto("tbltasks")
     .values({
-      task: "test",
+      task: data.task,
     })
     .returning("id")
     .executeTakeFirst();
 
   return {
     statusCode: 200,
-    body: "Task added.",
+    body: JSON.stringify({
+      message: `Task ${id?.id} added.`,
+      content: data.task,
+    }),
+  };
+}
+
+export async function removeTask(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  const id =
+    event.pathParameters && event.pathParameters.id
+      ? event.pathParameters.id
+      : null;
+
+  if (!id) {
+    return {
+      statusCode: 404,
+      body: JSON.stringify({ error: true }),
+    };
+  }
+
+  await db
+    .deleteFrom("tbltasks")
+    .where(sql`id = ${id}`)
+    .executeTakeFirst();
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({
+      message: `Task ${id} deleted.`,
+    }),
   };
 }
 
