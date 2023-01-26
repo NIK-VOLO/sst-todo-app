@@ -94,8 +94,8 @@
 
 .App-todo-row {
   display: flex;
-  gap: 1rem;
-  flex-direction: row;
+  gap: 0.5rem;
+  flex-direction: column;
   width: 100%;
   align-items: center;
   justify-content: center;
@@ -104,6 +104,8 @@
 
 .App-todo-item {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   flex-direction: row;
   background-color: white;
   border-radius: 5px;
