@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { trpc } from "../src/trpc";
 
 export default function TodoPage() {
@@ -7,6 +7,7 @@ export default function TodoPage() {
 
   const addTask = trpc.addTask.useMutation();
   const getTasks = trpc.getTasks.useQuery();
+  const deleteTask = trpc.deleteTask.useMutation();
 
   const handleInputChange = (event: React.FormEvent<HTMLInputElement>) => {
     setNewTask(event.currentTarget.value);
@@ -27,19 +28,45 @@ export default function TodoPage() {
       setTaskList(newList);
     } catch (error) {
       console.error(error);
-    } finally {
-      //   console.log("Updated Task List:", taskList);
     }
   };
 
-  const loadTasks = () => {
-    const data = getTasks.data;
-    console.log(data);
+  const removeTask = async (id: number) => {
+    try {
+      var newList: TodoItem[] = [];
+      taskList.forEach((element) => {
+        if (element.id !== id) {
+          newList.push(element);
+        }
+        setTaskList(newList);
+      });
+
+      const res = await deleteTask.mutateAsync({ id: id });
+      console.log(res);
+    } catch (error) {}
   };
+
+  const loadTasks = useCallback(() => {
+    try {
+      const data = getTasks.data;
+      if (data === undefined) {
+        throw new Error("No data returned from getTasks");
+      }
+      console.log(data);
+      var newList: TodoItem[] = [];
+      data.body.forEach((task: TodoItem) => {
+        newList.push({
+          id: task.id,
+          task: task.task,
+        });
+      });
+      setTaskList(newList);
+    } catch (error) {}
+  }, [getTasks.data]);
 
   useEffect(() => {
     loadTasks();
-  });
+  }, [loadTasks]);
 
   return (
     <div>
@@ -69,19 +96,21 @@ export default function TodoPage() {
           </div>
         </div>
         <div className="App-todo-list">
+          {getTasks.isLoading ? "Loading..." : ""}
           <div className="App-todo-row">
             {taskList.map((task) => (
               <div key={task.id} className="App-todo-item">
                 {task.task}
                 <div>
-                  <button className="btn App-delete-button">Remove</button>
+                  <button
+                    className="btn App-delete-button"
+                    onClick={() => removeTask(task.id)}
+                  >
+                    Remove
+                  </button>
                 </div>
               </div>
             ))}
-            {/* <div className="App-todo-item">asdfasf</div> */}
-            {/* <div>
-              <button className="btn App-delete-button">Remove</button>
-            </div> */}
           </div>
         </div>
       </div>

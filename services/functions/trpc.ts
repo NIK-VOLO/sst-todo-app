@@ -35,7 +35,7 @@ const appRouter = t.router({
     const data = await db.selectFrom("tbltasks").selectAll().execute();
     return {
       statusCode: 200,
-      body: JSON.stringify(data),
+      body: data,
     };
   }),
 
@@ -63,6 +63,26 @@ const appRouter = t.router({
             task: req.input.task,
           },
           //   content: req.input.task,
+        },
+      };
+    }),
+
+  deleteTask: t.procedure
+    .input(
+      z.object({
+        id: z.number(),
+      })
+    )
+    .mutation(async (req) => {
+      await db
+        .deleteFrom("tbltasks")
+        .where(sql`id = ${req.input.id}`)
+        .executeTakeFirst();
+
+      return {
+        statusCode: 200,
+        body: {
+          message: `Task ${req.input.id} deleted.`,
         },
       };
     }),
