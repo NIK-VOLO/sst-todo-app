@@ -6,10 +6,6 @@ import { DataApiDialect } from "kysely-data-api";
 import { RDS } from "@serverless-stack/node/rds";
 
 interface Database {
-  tblcounter: {
-    counter: string;
-    tally: number;
-  };
   tbltasks: {
     id: Generated<number>;
     task: string;
