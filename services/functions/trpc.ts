@@ -62,7 +62,6 @@ const appRouter = t.router({
             id: id?.id,
             task: req.input.task,
           },
-          //   content: req.input.task,
         },
       };
     }),
@@ -86,11 +85,6 @@ const appRouter = t.router({
         },
       };
     }),
-
-  getUser: t.procedure.input(z.string()).query((req) => {
-    req.input; // string
-    return { id: req.input, name: "Bilbo" };
-  }),
 });
 
 // export type definition of API

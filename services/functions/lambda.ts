@@ -4,6 +4,12 @@ import { DataApiDialect } from "kysely-data-api";
 import { RDS } from "@serverless-stack/node/rds";
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 
+/*****************************************
+ *
+ *          OBSOLETE CODE
+ *
+ *****************************************/
+
 interface Database {
   tblcounter: {
     counter: string;
@@ -114,27 +120,5 @@ export async function removeTask(
     body: JSON.stringify({
       message: `Task ${id} deleted.`,
     }),
-  };
-}
-
-export async function handler() {
-  const record = await db
-    .selectFrom("tblcounter")
-    .select("tally")
-    .where("counter", "=", "hits")
-    .executeTakeFirstOrThrow();
-
-  let count = record.tally;
-
-  await db
-    .updateTable("tblcounter")
-    .set({
-      tally: ++count,
-    })
-    .execute();
-
-  return {
-    statusCode: 200,
-    body: count,
   };
 }

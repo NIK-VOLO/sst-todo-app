@@ -26,11 +26,13 @@ export function MyStack({ stack }: StackContext) {
       "GET /trpc/{proxy+}": "functions/trpc.handler",
       "POST /trpc/{proxy+}": "functions/trpc.handler",
       "DELETE /trpc/{proxy+}": "functions/trpc.handler",
-      "POST /": "functions/lambda.handler",
-      "GET /tasks": "functions/lambda.getTasks",
-      "POST /tasks": "functions/lambda.addTask",
-      "PUT /tasks": "functions/lambda.updateTask",
-      "DELETE /tasks/{id}": "functions/lambda.removeTask",
+
+      // ****** OBSOLETE CODE ******
+      // "POST /": "functions/lambda.handler",
+      // "GET /tasks": "functions/lambda.getTasks",
+      // "POST /tasks": "functions/lambda.addTask",
+      // "PUT /tasks": "functions/lambda.updateTask",
+      // "DELETE /tasks/{id}": "functions/lambda.removeTask",
     },
   });
 
