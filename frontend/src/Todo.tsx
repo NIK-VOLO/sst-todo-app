@@ -1,18 +1,45 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { trpc } from "../src/trpc";
 
 export default function TodoPage() {
-  //   const hello = trpc.getUser.useQuery("input");
-  const addTask = trpc.addTask.useMutation();
+  const [taskList, setTaskList] = useState<TodoItem[]>([]);
   const [newTask, setNewTask] = useState("");
 
-  const handleChange = (event: React.FormEvent<HTMLInputElement>) => {
+  const addTask = trpc.addTask.useMutation();
+  const getTasks = trpc.getTasks.useQuery();
+
+  const handleInputChange = (event: React.FormEvent<HTMLInputElement>) => {
     setNewTask(event.currentTarget.value);
   };
 
-  const handleClick = () => {
-    addTask.mutate({ task: newTask });
+  const createTask = async () => {
+    try {
+      const data = await addTask.mutateAsync({ task: newTask });
+      const item = data.body.data;
+      if (item.id === undefined) {
+        throw new Error("No ID assigned to new task!");
+      }
+      const newList = [...taskList];
+      newList.push({
+        id: item.id,
+        task: item.task,
+      });
+      setTaskList(newList);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      //   console.log("Updated Task List:", taskList);
+    }
   };
+
+  const loadTasks = () => {
+    const data = getTasks.data;
+    console.log(data);
+  };
+
+  useEffect(() => {
+    loadTasks();
+  });
 
   return (
     <div>
@@ -26,7 +53,7 @@ export default function TodoPage() {
                 type="text"
                 className="input"
                 id="input"
-                onChange={handleChange}
+                onChange={handleInputChange}
                 value={newTask}
               />
             </form>
@@ -34,7 +61,7 @@ export default function TodoPage() {
               <button
                 className="btn App-add-button"
                 disabled={addTask.isLoading}
-                onClick={handleClick}
+                onClick={createTask}
               >
                 {addTask.isLoading ? "Adding..." : "Add"}
               </button>
@@ -43,10 +70,18 @@ export default function TodoPage() {
         </div>
         <div className="App-todo-list">
           <div className="App-todo-row">
-            <div className="App-todo-item">asdfasf</div>
-            <div>
+            {taskList.map((task) => (
+              <div key={task.id} className="App-todo-item">
+                {task.task}
+                <div>
+                  <button className="btn App-delete-button">Remove</button>
+                </div>
+              </div>
+            ))}
+            {/* <div className="App-todo-item">asdfasf</div> */}
+            {/* <div>
               <button className="btn App-delete-button">Remove</button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
