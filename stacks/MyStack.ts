@@ -23,6 +23,9 @@ export function MyStack({ stack }: StackContext) {
       },
     },
     routes: {
+      "GET /trpc/{proxy+}": "functions/trpc.handler",
+      "POST /trpc/{proxy+}": "functions/trpc.handler",
+      "DELETE /trpc/{proxy+}": "functions/trpc.handler",
       "POST /": "functions/lambda.handler",
       "GET /tasks": "functions/lambda.getTasks",
       "POST /tasks": "functions/lambda.addTask",
