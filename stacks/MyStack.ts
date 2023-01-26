@@ -24,7 +24,9 @@ export function MyStack({ stack }: StackContext) {
     },
     routes: {
       "POST /": "functions/lambda.handler",
+      "GET /tasks": "functions/lambda.getTasks",
       "POST /tasks": "functions/lambda.addTask",
+      "PUT /tasks": "functions/lambda.updateTask",
       "DELETE /tasks/{id}": "functions/lambda.removeTask",
     },
   });

@@ -27,6 +27,15 @@ const db = new Kysely<Database>({
   }),
 });
 
+export async function getTasks(): Promise<APIGatewayProxyResult> {
+  const data = await db.selectFrom("tbltasks").selectAll().execute();
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify(data),
+  };
+}
+
 export async function addTask(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
@@ -53,13 +62,40 @@ export async function addTask(
   };
 }
 
+export async function updateTask(
+  event: APIGatewayProxyEvent
+): Promise<APIGatewayProxyResult> {
+  if (event.body == null || event.body == undefined) {
+    return { statusCode: 500, body: "Bad Request" };
+  }
+
+  const data = JSON.parse(event.body);
+
+  console.log(data);
+
+  const id = await db
+    .updateTable("tbltasks")
+    .set({ task: "test12" })
+    .where("id", "=", 1)
+    .returning("id")
+    .executeTakeFirst();
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({
+      message: `Task ${id?.id} updated.`,
+      content: data.task,
+    }),
+  };
+}
+
 export async function removeTask(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   const id =
     event.pathParameters && event.pathParameters.id
-      ? event.pathParameters.id
-      : null;
+      ? parseInt(event.pathParameters.id)
+      : 0;
 
   if (!id) {
     return {
