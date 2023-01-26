@@ -56,10 +56,10 @@ const appRouter = t.router({
 
       return {
         statusCode: 200,
-        body: JSON.stringify({
+        body: {
           message: `Task ${id?.id} added.`,
           content: req.input.task,
-        }),
+        },
       };
     }),
 
