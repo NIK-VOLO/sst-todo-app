@@ -58,7 +58,11 @@ const appRouter = t.router({
         statusCode: 200,
         body: {
           message: `Task ${id?.id} added.`,
-          content: req.input.task,
+          data: {
+            id: id?.id,
+            task: req.input.task,
+          },
+          //   content: req.input.task,
         },
       };
     }),
